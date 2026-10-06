@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Typing Test</title>
+<style>
+:root{--bg:#f6f5f1;--card:#fff;--fg:#1d1d1b;--mute:#8a8a84;--ok:#1d1d1b;--bad:#d33;--badbg:#fde4e4;--acc:#2a6df4;--line:#e3e1da;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141413;--card:#1e1e1c;--fg:#ecebe6;--mute:#7d7d77;--ok:#ecebe6;--bad:#ff6b6b;--badbg:#3a1f1f;--acc:#6b9bff;--line:#2d2d2a}}
+:root[data-theme="dark"]{--bg:#141413;--card:#1e1e1c;--fg:#ecebe6;--mute:#7d7d77;--ok:#ecebe6;--bad:#ff6b6b;--badbg:#3a1f1f;--acc:#6b9bff;--line:#2d2d2a}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh}
+.wrap{max-width:860px;margin:0 auto;padding:24px 16px}
+h1{font-size:20px;margin:0 0 18px;font-weight:600;letter-spacing:.2px}
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:14px}
+.seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{border:0;background:none;color:var(--mute);padding:9px 16px;font-size:14px;cursor:pointer}
+.seg button.on{background:var(--acc);color:#fff}
+.stats{display:flex;gap:18px;font-variant-numeric:tabular-nums}
+.stat{text-align:center}.stat b{display:block;font-size:22px}.stat span{font-size:11px;color:var(--mute);text-transform:uppercase;letter-spacing:.6px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;height:180px;overflow:hidden;position:relative;cursor:text}
+#text{font-family:var(--tf);font-size:var(--ts);line-height:1.75;word-break:break-word;position:relative}
+#text span{color:var(--mute)}
+#text span.c{color:var(--ok)}
+#text span.w{color:var(--bad);background:var(--badbg);border-radius:3px}
+.hint{color:var(--mute);font-size:13px;margin-top:10px}
+.btn{background:var(--acc);color:#fff;border:0;border-radius:10px;padding:10px 18px;font-size:14px;cursor:pointer}
+#in{position:absolute;opacity:0;pointer-events:none;left:-9999px}
+#res{display:none;margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+#res.show{display:block}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:14px;margin:14px 0}
+.grid div{border:1px solid var(--line);border-radius:10px;padding:12px}
+.grid b{font-size:26px;display:block;font-variant-numeric:tabular-nums}.grid span{font-size:12px;color:var(--mute)}
+.big{font-size:44px;font-weight:700}
+.best{color:var(--mute);font-size:13px}
+.ta{width:100%;height:180px;resize:vertical;background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:14px;padding:16px 18px;font:20px/1.6 var(--tf)}
+.ta:focus{outline:2px solid var(--acc)}
+.btn.sec{background:var(--card);color:var(--fg);border:1px solid var(--line)}
+.row{margin-top:10px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.row label{font-size:13px;color:var(--mute)}
+.diff{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:17px;line-height:2;margin-top:12px;padding:14px;border:1px solid var(--line);border-radius:10px;max-height:320px;overflow:auto}
+.diff .w,.diff .ex{color:var(--bad);background:var(--badbg);text-decoration:line-through;border-radius:3px;padding:0 2px}
+.diff .fix{color:#1a8a4a;font-weight:600;margin:0 2px 0 3px}
+.diff .miss{color:#1a8a4a;border-bottom:2px solid #1a8a4a;font-weight:600}
+
+:root{--tf:ui-monospace,Menlo,Consolas,monospace;--ts:21px}
+.seg button.on,.btn{color:var(--onacc,#fff)}
+.btn.sec{color:var(--fg)}
+.wrap{animation:rise .5s ease both}
+.seg button,.btn{transition:background .2s,color .2s,transform .12s}
+.btn:hover{transform:translateY(-1px)}.btn:active{transform:scale(.97)}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+#res.show,#fres{animation:rise .45s ease both}
+.panel{display:none;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 16px;margin-bottom:14px}
+.panel.open{display:block;animation:rise .3s ease both}
+.srow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:5px 0}
+.srow>span{width:84px;font-size:12px;color:var(--mute);text-transform:uppercase;letter-spacing:.6px}
+.sg{display:flex;gap:6px;flex-wrap:wrap}
+.sg button{border:1px solid var(--line);background:none;color:var(--fg);border-radius:8px;padding:5px 11px;font-size:13px;cursor:pointer;transition:.15s}
+.sg button.on{background:var(--acc);color:var(--onacc,#fff);border-color:var(--acc)}
+.sg button.dot{width:24px;height:24px;padding:0;border-radius:50%}
+.sg button.dot.on{outline:2px solid var(--fg);outline-offset:2px}
+.prog{height:4px;background:var(--line);border-radius:4px;margin-bottom:14px;overflow:hidden}
+.prog i{display:block;height:100%;width:0;background:var(--acc);transition:width .25s linear}
+.box{transition:border-color .3s,box-shadow .3s}
+.box.live{border-color:var(--acc);box-shadow:0 0 0 3px color-mix(in srgb,var(--acc) 18%,transparent)}
+.box.shake{animation:shk .18s}
+@keyframes shk{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+#text span{position:relative}
+#text span.c{animation:okf .35s ease-out}
+#text span.w{animation:badf .35s ease-out}
+@keyframes okf{from{background:color-mix(in srgb,var(--acc) 40%,transparent)}to{background:transparent}}
+@keyframes badf{from{background:var(--bad)}to{background:var(--badbg)}}
+#text span.cur::before{content:"";position:absolute;left:-1px;top:12%;height:76%;width:2px;background:var(--acc);animation:blink 1s steps(1) infinite}
+body.caret-block #text span.cur::before{left:0;top:6%;height:88%;width:100%;opacity:.3;animation:none;border-radius:3px}
+body.caret-under #text span.cur::before{left:0;top:auto;bottom:2px;height:3px;width:100%;border-radius:2px}
+@keyframes blink{50%{opacity:0}}
+#t.low{color:var(--bad);animation:pulse 1s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.18)}}
+.cf{position:fixed;top:55%;width:8px;height:12px;border-radius:2px;z-index:9;pointer-events:none;animation:cf 1.4s cubic-bezier(.2,.7,.3,1) forwards}
+@keyframes cf{0%{transform:translate(0,0) rotate(0);opacity:1}45%{transform:translate(calc(var(--dx)*.6),var(--dy)) rotate(calc(var(--r)*.5))}100%{transform:translate(var(--dx),420px) rotate(var(--r));opacity:0}}
+body.noanim *,body.noanim *::before,body.noanim *::after{animation:none!important;transition:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Typing Test</h1>
+  <div class="bar">
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+    <div class="seg" id="modes"><button data-mode="std" class="on">Standard</button><button data-mode="free">Free typing</button></div>
+    <div class="seg" id="dur">
+      <button data-m="1" class="on">1 min</button><button data-m="2">2 min</button><button data-m="3">3 min</button>
+    </div><button class="btn sec" id="sbtn">Style</button></div>
+    <div class="stats">
+      <div class="stat"><b id="t">1:00</b><span>Time</span></div>
+      <div class="stat"><b id="lw">0</b><span>WPM</span></div>
+      <div class="stat"><b id="la">100%</b><span>Accuracy</span></div>
+      <div class="stat"><b id="le">0</b><span>Errors</span></div>
+    </div>
+  </div>
+  <div id="style" class="panel"></div>
+  <div class="prog"><i id="prog"></i></div>
+  <div class="box" id="box"><div id="text"></div></div>
+  <textarea id="in" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></textarea>
+  <div class="hint" id="hint">Timer starts on first keystroke. Backspace works. Tab = restart.</div>
+  <div id="freeWrap" style="display:none">
+    <textarea id="free" class="ta" placeholder="Type from your own source. Nothing is shown here." autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></textarea>
+    <div class="row"><button class="btn sec" id="finish">Finish now</button></div>
+  </div>
+  <div id="chk" style="display:none;margin-top:16px">
+    <div class="hint" style="margin:0 0 8px">Time's up. Paste the original text you were copying, then check.</div>
+    <textarea id="ref" class="ta" style="height:140px;font-size:16px" placeholder="Paste original text here"></textarea>
+    <div class="row"><button class="btn" id="go">Find errors</button>
+    <label><input type="checkbox" id="trim" checked> Ignore the part of the source I didn't reach</label></div>
+  </div>
+  <div id="fres" style="display:none;margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px">
+    <div><span class="big" id="fw">0</span> <span class="best">net WPM</span></div>
+    <div class="grid">
+      <div><b id="fraw">0</b><span>Raw WPM</span></div>
+      <div><b id="facc">0%</b><span>Accuracy</span></div>
+      <div><b id="fwrong">0</b><span>Wrong words</span></div>
+      <div><b id="fmiss">0</b><span>Missing words</span></div>
+      <div><b id="fex">0</b><span>Extra words</span></div>
+      <div><b id="fch">0</b><span>Error characters</span></div>
+    </div>
+    <div class="best">Red struck = what you typed. Green = correct word. Underlined green = skipped. Struck red alone = extra.</div>
+    <div class="diff" id="diff"></div>
+    <p><button class="btn" id="again2">Try again</button></p>
+  </div>
+
+  <div id="res">
+    <div class="best" id="mode"></div>
+    <div><span class="big" id="rw">0</span> <span class="best">net WPM</span></div>
+    <div class="grid">
+      <div><b id="rraw">0</b><span>Raw WPM (gross)</span></div>
+      <div><b id="racc">0%</b><span>Accuracy</span></div>
+      <div><b id="rmis">0</b><span>Mistakes typed</span></div>
+      <div><b id="rleft">0</b><span>Uncorrected errors</span></div>
+      <div><b id="rchars">0</b><span>Correct chars</span></div>
+    </div>
+    <div class="best" id="best"></div>
+    <p><button class="btn" id="again">Try again</button></p>
+  </div>
+</div>
+
+<script>
+const WORDS="the be to of and a in that have it for not on with he as you do at this but his by from they we say her she or an will my one all would there their what so up out if about who get which go me when make can like time no just him know take people into year your good some could them see other than then now look only come its over think also back after use two how our work first well way even new want because any these give day most us is was are were been has had did said each tell does set three want air play small end put home read hand port large spell add even land here must big high such follow act why ask men change went light kind off need house picture try again animal point mother world near build self earth father head stand own page should country found answer school grow study still learn plant cover food sun four between state keep eye never last let thought city tree cross farm hard start might story saw far sea draw left late run while press close night real life few north open seem together next white children begin got walk example ease paper group always music those both mark often letter until mile river car feet care second book carry took science eat room friend began idea fish mountain stop once base hear horse cut sure watch color face wood main enough plain girl usual young ready above ever red list though feel talk bird soon body dog family direct pose leave song measure door product black short numeral class wind question happen complete ship area half rock order fire south problem piece told knew pass since top whole king space heard best hour better true during hundred five remember step early hold west ground interest reach fast verb sing listen six table travel less morning ten simple several vowel toward war lay against pattern slow center love person money serve appear road map rain rule govern pull cold notice voice unit power town fine certain fly fall lead cry dark machine note wait plan figure star box noun field rest correct able pound done beauty drive stood contain front teach week final gave green oh quick develop ocean warm free minute strong special mind behind clear tail produce fact street inch multiply nothing course stay wheel full force blue object decide surface deep moon island foot system busy test record boat common gold possible plane stead dry wonder laugh thousand ago ran check game shape equate miss brought heat snow tire bring yes distant fill east paint language among".split(" ");
+const $=id=>document.getElementById(id);
+const box=$('box'),textEl=$('text'),inp=$('in');
+let mode="std",target="",spans=[],mins=1,started=false,done=false,startT=0,total=0,mistakes=0,prevLen=0,timer=null;
+
+function genWords(n){let o=[],last="";for(let i=0;i<n;i++){let w;do{w=WORDS[Math.floor(Math.random()*WORDS.length)]}while(w===last);o.push(w);last=w}return o.join(" ")}
+function append(str){
+  const frag=document.createDocumentFragment();
+  for(const ch of str){const s=document.createElement('span');s.textContent=ch;spans.push(s);frag.appendChild(s)}
+  textEl.appendChild(frag);target+=str;
+}
+function reset(){
+  clearInterval(timer);started=done=false;total=mistakes=prevLen=0;
+  inp.value="";inp.disabled=false;target="";spans=[];textEl.innerHTML="";textEl.style.transform="";
+  append(genWords(250));
+  spans[0].classList.add('cur');
+  $('res').classList.remove('show');
+  upd(mins*60);$('lw').textContent="0";$('la').textContent="100%";$('le').textContent="0";
+  $('prog').style.width='0';$('t').classList.remove('low');box.classList.remove('live');
+  const fr=mode==='free';
+  box.style.display=fr?'none':'';$('freeWrap').style.display=fr?'':'none';
+  $('chk').style.display='none';$('fres').style.display='none';
+  $('free').value='';$('free').disabled=false;$('ref').value='';
+  $('hint').textContent=fr?'Type from your own source (book, page, other screen). Timer starts on first keystroke. Tab = restart.':'Timer starts on first keystroke. Backspace works. Tab = restart.';
+  if(fr){$('la').textContent='\u2014';$('le').textContent='\u2014'}
+  (fr?$('free'):inp).focus({preventScroll:true});
+}
+function fmt(s){s=Math.max(0,Math.ceil(s));return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")}
+function upd(left){$('t').textContent=fmt(left)}
+function stats(elapsedSec){
+  const v=inp.value;let correct=0,wrong=0;
+  for(let i=0;i<v.length;i++){v[i]===target[i]?correct++:wrong++}
+  const m=Math.max(elapsedSec,1)/60;
+  return{correct,wrong,net:Math.max(0,Math.round((correct/5)/m)),raw:Math.round((v.length/5)/m),
+    acc:total?Math.max(0,Math.round((1-mistakes/total)*100)):100};
+}
+function tick(){
+  const el=(performance.now()-startT)/1000,left=mins*60-el;
+  if(left<=0){finish();return}
+  upd(left);$('t').classList.toggle('low',left<=10);$('prog').style.width=(el/(mins*60)*100)+'%';box.classList.add('live');
+  if(mode==='free'){$('lw').textContent=Math.round($('free').value.length/5/Math.max(el,1)*60);return}
+  const s=stats(el);
+  $('lw').textContent=s.net;$('la').textContent=s.acc+"%";$('le').textContent=mistakes;
+}
+function finish(){
+  if(mode==='free')return finishFree();
+  if(done)return;done=true;clearInterval(timer);inp.disabled=true;upd(0);$('prog').style.width='100%';$('t').classList.remove('low');
+  const s=stats(mins*60);
+  countUp($('rw'),s.net);$('rraw').textContent=s.raw;$('racc').textContent=s.acc+"%";
+  $('rmis').textContent=mistakes;$('rleft').textContent=s.wrong;$('rchars').textContent=s.correct;
+  $('mode').textContent=mins+" minute test";
+  let b=null,key="typing-best-"+mins;
+  try{b=parseInt(localStorage.getItem(key))||0;if(s.net>b){localStorage.setItem(key,s.net);if(b)confetti();$('best').textContent=b?"New best (previous "+b+" WPM).":"First recorded score.";}else $('best').textContent="Best for "+mins+" min: "+b+" WPM."}catch(e){$('best').textContent=""}
+  $('lw').textContent=s.net;$('la').textContent=s.acc+"%";$('le').textContent=mistakes;
+  $('res').classList.add('show');
+  $('res').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+const PRE={auto:null,
+light:{bg:'#f6f5f1',card:'#fff',fg:'#1d1d1b',mute:'#8a8a84',line:'#e3e1da',bad:'#d33',badbg:'#fde4e4',acc:'#2a6df4'},
+dark:{bg:'#141413',card:'#1e1e1c',fg:'#ecebe6',mute:'#7d7d77',line:'#2d2d2a',bad:'#ff6b6b',badbg:'#3a1f1f',acc:'#6b9bff'},
+sepia:{bg:'#f1e7d0',card:'#faf3e0',fg:'#4a3b2a',mute:'#a39579',line:'#dccfae',bad:'#b3261e',badbg:'#f3d3c9',acc:'#b45309'},
+midnight:{bg:'#0b1020',card:'#121a33',fg:'#dbe4ff',mute:'#6b7aa6',line:'#222c4d',bad:'#ff7a8a',badbg:'#3a1a2a',acc:'#5eead4'},
+forest:{bg:'#0f1a14',card:'#16251c',fg:'#dcefe2',mute:'#6f8f7c',line:'#24382b',bad:'#ff8a7a',badbg:'#3a211c',acc:'#4ade80'},
+neon:{bg:'#0a0a12',card:'#12121f',fg:'#f3e8ff',mute:'#7a6f99',line:'#2a2144',bad:'#ff4d6d',badbg:'#3a1226',acc:'#e879f9'}};
+const VARS=['bg','card','fg','mute','ok','line','bad','badbg','acc'];
+const ACC=['#2a6df4','#16a34a','#8b5cf6','#f97316','#e11d48','#0d9488'];
+const FONTS={mono:'ui-monospace,Menlo,Consolas,monospace',sans:'system-ui,-apple-system,"Segoe UI",Roboto,sans-serif',serif:'Georgia,"Times New Roman",serif'};
+const SIZES={s:'17px',m:'21px',l:'26px'};
+let S={preset:'auto',accent:'',font:'mono',size:'m',caret:'line',anim:!matchMedia('(prefers-reduced-motion:reduce)').matches};
+try{Object.assign(S,JSON.parse(localStorage.getItem('typing-style')||'{}'))}catch(e){}
+function applyStyle(){
+  const r=document.documentElement,P=PRE[S.preset]||null;
+  VARS.forEach(k=>r.style.removeProperty('--'+k));
+  if(P){for(const k in P)r.style.setProperty('--'+k,P[k]);r.style.setProperty('--ok',P.fg)}
+  if(S.accent)r.style.setProperty('--acc',S.accent);
+  r.style.setProperty('--tf',FONTS[S.font]);r.style.setProperty('--ts',SIZES[S.size]);
+  const a=getComputedStyle(r).getPropertyValue('--acc').trim(),m=/^#([0-9a-f]{6})$/i.exec(a);
+  if(m){const n=parseInt(m[1],16),l=.299*(n>>16)+.587*((n>>8)&255)+.114*(n&255);r.style.setProperty('--onacc',l>150?'#111':'#fff')}
+  document.body.className='caret-'+S.caret+(S.anim?'':' noanim');
+  try{localStorage.setItem('typing-style',JSON.stringify(S))}catch(e){}
+  buildStyle();
+}
+function buildStyle(){
+  const el=$('style');el.textContent='';
+  const row=(label,items,key)=>{
+    const d=document.createElement('div');d.className='srow';
+    const l=document.createElement('span');l.textContent=label;d.appendChild(l);
+    const g=document.createElement('div');g.className='sg';
+    items.forEach(([v,t,c])=>{
+      const b=document.createElement('button');b.type='button';
+      if(c){b.className='dot';b.style.background=c;b.title=t}else b.textContent=t;
+      if(S[key]===v)b.classList.add('on');
+      b.onclick=()=>{S[key]=v;applyStyle()};g.appendChild(b);
+    });
+    d.appendChild(g);el.appendChild(d);
+  };
+  row('Theme',[['auto','Auto'],['light','Light'],['dark','Dark'],['sepia','Sepia'],['midnight','Midnight'],['forest','Forest'],['neon','Neon']],'preset');
+  row('Accent',[['','Default'],...ACC.map(c=>[c,c,c])],'accent');
+  row('Font',[['mono','Mono'],['sans','Sans'],['serif','Serif']],'font');
+  row('Size',[['s','S'],['m','M'],['l','L']],'size');
+  row('Caret',[['line','Line'],['block','Block'],['under','Underline']],'caret');
+  row('Animations',[[true,'On'],[false,'Off']],'anim');
+}
+function shake(){if(S.anim){box.classList.remove('shake');void box.offsetWidth;box.classList.add('shake')}}
+function countUp(el,to){
+  if(!S.anim||to<=0){el.textContent=to;return}
+  const t0=performance.now();
+  (function f(t){const k=Math.min(1,(t-t0)/700);el.textContent=Math.round(to*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(f)})(t0);
+}
+function confetti(){
+  if(!S.anim)return;
+  const cs=['#f87171','#fbbf24','#34d399','#60a5fa','#c084fc'];
+  for(let i=0;i<40;i++){
+    const p=document.createElement('i');p.className='cf';
+    p.style.cssText='left:'+(40+Math.random()*20)+'%;background:'+cs[i%5]+';--dx:'+((Math.random()-.5)*600)+'px;--dy:'+(-200-Math.random()*250)+'px;--r:'+(Math.random()*720)+'deg;animation-delay:'+(Math.random()*.1)+'s';
+    document.body.appendChild(p);setTimeout(()=>p.remove(),1600);
+  }
+}
+let fEl=0;
+function finishFree(){
+  if(done)return;done=true;clearInterval(timer);
+  fEl=Math.min((performance.now()-startT)/1000,mins*60);
+  $('free').disabled=true;upd(Math.max(0,mins*60-fEl));$('prog').style.width='100%';$('t').classList.remove('low');
+  $('lw').textContent=Math.round($('free').value.length/5/Math.max(fEl,1)*60);
+  $('chk').style.display='';$('ref').focus();
+}
+function tok(s){return s.trim().split(/\s+/).filter(Boolean)}
+function lev(a,b){let p=Array.from({length:b.length+1},(_,i)=>i);for(let i=1;i<=a.length;i++){let c=[i];for(let j=1;j<=b.length;j++)c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));p=c}return p[b.length]}
+function check(){
+  const R=tok($('ref').value),T=tok($('free').value);
+  if(!R.length){$('ref').focus();return}
+  const n=R.length,m=T.length,W=m+1,D=new Int32Array((n+1)*W);
+  for(let i=0;i<=n;i++)D[i*W]=i;
+  for(let j=0;j<=m;j++)D[j]=j;
+  const cost=(i,j)=>R[i-1]===T[j-1]?0:1;
+  for(let i=1;i<=n;i++)for(let j=1;j<=m;j++)D[i*W+j]=Math.min(D[(i-1)*W+j]+1,D[i*W+j-1]+1,D[(i-1)*W+j-1]+cost(i,j));
+  let ops=[],i=n,j=m;
+  while(i>0||j>0){
+    if(i>0&&j>0&&D[i*W+j]===D[(i-1)*W+j-1]+cost(i,j)){ops.push(cost(i,j)?{k:'sub',r:R[i-1],w:T[j-1]}:{k:'ok',r:R[i-1]});i--;j--}
+    else if(i>0&&D[i*W+j]===D[(i-1)*W+j]+1){ops.push({k:'miss',r:R[i-1]});i--}
+    else{ops.push({k:'ex',w:T[j-1]});j--}
+  }
+  ops.reverse();
+  if($('trim').checked)while(ops.length&&ops[ops.length-1].k==='miss')ops.pop();
+  const c={ok:0,sub:0,miss:0,ex:0},d=$('diff');let ec=0;d.textContent='';
+  const add=(t,cl)=>{const s=document.createElement('span');s.textContent=t;if(cl)s.className=cl;d.appendChild(s)};
+  for(const o of ops){
+    c[o.k]++;
+    if(o.k==='ok')add(o.r);
+    else if(o.k==='sub'){ec+=lev(o.r,o.w);add(o.w,'w');add(o.r,'fix')}
+    else if(o.k==='miss'){ec+=o.r.length;add(o.r,'miss')}
+    else{ec+=o.w.length;add(o.w,'ex')}
+    d.appendChild(document.createTextNode(' '));
+  }
+  const tc=$('free').value.length,mn=Math.max(fEl,1)/60;
+  countUp($('fw'),Math.max(0,Math.round((tc-ec)/5/mn)));
+  $('fraw').textContent=Math.round(tc/5/mn);
+  $('facc').textContent=Math.max(0,Math.round((1-ec/Math.max(tc,1))*100))+'%';
+  $('fwrong').textContent=c.sub;$('fmiss').textContent=c.miss;$('fex').textContent=c.ex;$('fch').textContent=ec;
+  $('la').textContent=$('facc').textContent;$('le').textContent=ec;
+  $('fres').style.display='block';$('fres').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function render(){
+  const v=inp.value,n=v.length;
+  for(let i=0;i<spans.length;i++){
+    const s=spans[i];
+    let c="";
+    if(i<n)c=v[i]===target[i]?"c":"w";
+    if(i===n)c+=" cur";
+    if(s.className!==c)s.className=c;
+  }
+  const cur=spans[Math.min(n,spans.length-1)];
+  const top=cur.offsetTop,lh=parseFloat(getComputedStyle(textEl).lineHeight);
+  textEl.style.transform="translateY("+(-Math.max(0,top-lh))+"px)";
+  if(n>target.length-200)append(" "+genWords(100));
+}
+inp.addEventListener('input',e=>{
+  if(done)return;
+  const v=inp.value;
+  if(!started){started=true;startT=performance.now();timer=setInterval(tick,200)}
+  if(v.length>prevLen){
+    for(let i=prevLen;i<v.length;i++){total++;if(v[i]!==target[i]){mistakes++;shake()}}
+  }
+  prevLen=v.length;
+  render();
+});
+inp.addEventListener('paste',e=>e.preventDefault());
+document.addEventListener('keydown',e=>{
+  if(e.key==="Tab"&&document.activeElement!==$('ref')){e.preventDefault();reset();return}
+  if(mode==='std'&&!done&&document.activeElement!==inp&&!e.ctrlKey&&!e.metaKey)inp.focus({preventScroll:true});
+});
+box.addEventListener('click',()=>inp.focus({preventScroll:true}));
+$('again').addEventListener('click',reset);
+$('dur').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  mins=+b.dataset.m;
+  document.querySelectorAll('#dur button').forEach(x=>x.classList.toggle('on',x===b));
+  reset();
+});
+$('free').addEventListener('input',()=>{if(done)return;if(!started){started=true;startT=performance.now();timer=setInterval(tick,200)}});
+$('free').addEventListener('paste',e=>e.preventDefault());
+$('finish').addEventListener('click',()=>{if(started)finishFree()});
+$('go').addEventListener('click',check);
+$('again2').addEventListener('click',reset);
+$('modes').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;mode=b.dataset.mode;document.querySelectorAll('#modes button').forEach(x=>x.classList.toggle('on',x===b));reset()});
+$('sbtn').onclick=()=>$('style').classList.toggle('open');
+matchMedia('(prefers-color-scheme:dark)').addEventListener('change',applyStyle);
+applyStyle();
+reset();
+</script>
+</body>
+</html>
